@@ -11,12 +11,17 @@ use Stancl\Tenancy\Database\Concerns\HasDomains;
 class Tenant extends Model
 {
     use HasDatabase, HasDomains;
+    protected $fillable = [
+        'name',
+        'email',
+    ];
 
     public static function getCustomColumns(): array
     {
         return [
             'id',
             'name',
+            'email',
         ];
     }
 }
