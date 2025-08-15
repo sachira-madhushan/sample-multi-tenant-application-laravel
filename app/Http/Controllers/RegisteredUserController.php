@@ -32,8 +32,7 @@ class RegisteredUserController extends Controller
             // Find the tenant for this user
             $tenant = Tenant::where('email', $request->email)->first();
             if ($tenant) {
-                $maindomain = config('session.domain');
-                return redirect()->away('http://' . $tenant->domains->first()->domain . $maindomain);
+                return redirect()->away('http://' . $tenant->domains->first()->domain);
             }
 
             // If no tenant found, just redirect home
@@ -61,7 +60,7 @@ class RegisteredUserController extends Controller
         ]);
 
         // Create the tenant's domain
-        $tenant->domains()->create(['domain' => $request->subdomain]);
+        $tenant->domains()->create(['domain' => $request->subdomain.config('session.domain')]);
 
         // Create the initial user in the **central users table**, not tenant DB
         $user = User::create([
@@ -73,7 +72,7 @@ class RegisteredUserController extends Controller
         // Log in the new user
         Auth::login($user);
 
-        return redirect()->to('http://' . $tenant->domains->first()->domain . config('session.domain'));
+        return redirect()->to('http://' . $tenant->domains->first()->domain);
     }
 
     public function logout(Request $request)
