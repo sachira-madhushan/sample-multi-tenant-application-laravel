@@ -3,16 +3,30 @@
 use Illuminate\Support\Facades\Route;
 use App\Http\Controllers\PostController;
 use App\Http\Controllers\RegisteredUserController;
-
-Route::get('/', function () {
-    return view('auth.register');
-});
-
-Route::post('/register', [RegisteredUserController::class, 'store'])->name('register');
+use Stancl\Tenancy\Middleware\InitializeTenancyByDomain;
+use Stancl\Tenancy\Middleware\PreventAccessFromCentralDomains;
 
 
-Route::get('/login', [RegisteredUserController::class, 'showLoginForm'])->name('login');
-Route::post('/login', [RegisteredUserController::class, 'login'])->name('login.post');
+foreach (config('tenancy.central_domains') as $domain) {
+    Route::domain($domain)->group(function () {
+        // your actual routes
+    });
+}
+
+Route::middleware(['web',])
+    ->domain('tenant-laravel.com')
+    ->group(function () {
+        Route::get('/', function () {
+            return view('auth.register');
+        });
+
+        Route::post('/register', [RegisteredUserController::class, 'store'])->name('register');
+
+
+        Route::get('/login', [RegisteredUserController::class, 'showLoginForm'])->name('login');
+        Route::post('/login', [RegisteredUserController::class, 'login'])->name('login.post');
+    });
+
 
 Route::middleware(['web', 'auth', 'tenancy'])
     ->domain('{tenant}.tenant-laravel.com')
