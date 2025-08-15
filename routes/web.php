@@ -23,10 +23,10 @@ Route::middleware(['web',])
     });
 
 
-Route::middleware(['web', 'auth', 'tenancy'])
-    ->domain('{tenant}.tenant-laravel.com')
-    ->group(function () {
-        Route::get('/', [PostController::class, 'index'])->name('posts.index');
-        Route::post('/posts', [PostController::class, 'store'])->name('posts.store');
-        Route::get('/logout', [RegisteredUserController::class, 'logout'])->name('logout');
-    });
+// Route::middleware(['web', 'auth', 'tenancy'])
+//     ->domain('{tenant}.tenant-laravel.com')
+//     ->group(function () {
+//         Route::get('/', [PostController::class, 'index'])->name('posts.index');
+//         Route::post('/posts', [PostController::class, 'store'])->name('posts.store');
+//         Route::get('/logout', [RegisteredUserController::class, 'logout'])->name('logout');
+//     });
