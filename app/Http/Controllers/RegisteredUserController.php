@@ -25,20 +25,19 @@ class RegisteredUserController extends Controller
             'password' => 'required',
         ]);
 
-        // Find tenant by email
-        $tenant = Tenant::where('email', $request->email)->first();
-        $maindomain  = config('session.domain');
+        // Attempt login in central database
+        if (Auth::attempt($request->only('email', 'password'))) {
+            $request->session()->regenerate();
 
-        if ($tenant) {
-            // Initialize tenant
-            Tenancy::initialize($tenant);
-
-            if (Auth::attempt(['email' => $request->email, 'password' => $request->password])) {
-                $request->session()->regenerate();
-
-                return redirect()->away('http://' . $tenant->domains->first()->domain.$maindomain);
-
+            // Find the tenant for this user
+            $tenant = Tenant::where('email', $request->email)->first();
+            if ($tenant) {
+                $maindomain = config('session.domain');
+                return redirect()->away('http://' . $tenant->domains->first()->domain . $maindomain);
             }
+
+            // If no tenant found, just redirect home
+            return redirect()->intended('/');
         }
 
         throw ValidationException::withMessages([
@@ -46,12 +45,11 @@ class RegisteredUserController extends Controller
         ]);
     }
 
-
     public function store(Request $request)
     {
         $request->validate([
             'name' => 'required|string|max:255',
-            'email' => 'required|string|email|max:255|unique:tenants,email',
+            'email' => 'required|string|email|max:255|unique:users,email', // central users table
             'password' => 'required|string|min:8|confirmed',
             'subdomain' => 'required|string|alpha_dash|min:3|unique:domains,domain',
         ]);
@@ -62,21 +60,20 @@ class RegisteredUserController extends Controller
             'email' => $request->email,
         ]);
 
-        // Create the new tenant's database and run migrations
+        // Create the tenant's domain
         $tenant->domains()->create(['domain' => $request->subdomain]);
-        Tenancy::initialize($tenant);
 
-        // Create the initial user in the tenant's new database
+        // Create the initial user in the **central users table**, not tenant DB
         $user = User::create([
             'name' => $request->name,
             'email' => $request->email,
             'password' => Hash::make($request->password),
         ]);
 
-        // Log in the new user and redirect
+        // Log in the new user
         Auth::login($user);
 
-        return redirect()->to('http://' . $tenant->domains->first()->domain);
+        return redirect()->to('http://' . $tenant->domains->first()->domain . config('session.domain'));
     }
 
     public function logout(Request $request)

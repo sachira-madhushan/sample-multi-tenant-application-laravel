@@ -7,11 +7,6 @@ use Stancl\Tenancy\Middleware\InitializeTenancyByDomain;
 use Stancl\Tenancy\Middleware\PreventAccessFromCentralDomains;
 
 
-foreach (config('tenancy.central_domains') as $domain) {
-    Route::domain($domain)->group(function () {
-        // your actual routes
-    });
-}
 
 Route::middleware(['web',])
     ->domain('tenant-laravel.com')
