@@ -2,6 +2,8 @@
 
 declare(strict_types=1);
 
+use App\Http\Controllers\PostController;
+use App\Http\Controllers\RegisteredUserController;
 use Illuminate\Support\Facades\Route;
 use Stancl\Tenancy\Middleware\InitializeTenancyByDomain;
 use Stancl\Tenancy\Middleware\PreventAccessFromCentralDomains;
@@ -26,4 +28,9 @@ Route::middleware([
     Route::get('/', function () {
         return 'This is your multi-tenant application. The id of the current tenant is ' . tenant('id');
     });
+
+    Route::get('/p', [PostController::class, 'index'])->name('posts.index');
+        Route::post('/posts', [PostController::class, 'store'])->name('posts.store');
+        Route::get('/logout', [RegisteredUserController::class, 'logout'])->name('logout');
+
 });
