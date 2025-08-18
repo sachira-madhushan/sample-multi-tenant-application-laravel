@@ -20,8 +20,11 @@ Route::middleware(['web',])
 
         Route::get('/login', [RegisteredUserController::class, 'showLoginForm'])->name('login');
         Route::post('/login', [RegisteredUserController::class, 'login'])->name('login.post');
-    });
+});
 
+Route::get('/', function () {
+            return view('auth.register');
+        });
 
 // Route::middleware(['web', 'auth', 'tenancy'])
 //     ->domain('{tenant}.tenant-laravel.com')

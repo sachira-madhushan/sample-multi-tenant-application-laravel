@@ -60,16 +60,24 @@ class RegisteredUserController extends Controller
         ]);
 
         // Create the tenant's domain
-        $tenant->domains()->create(['domain' => $request->subdomain.config('session.domain')]);
+        $tenant->domains()->create(['domain' => $request->subdomain . config('session.domain')]);
 
         // Create the initial user in the **central users table**, not tenant DB
+        User::create([
+            'name' => $request->name,
+            'email' => $request->email,
+            'password' => Hash::make($request->password),
+        ]);
+
+        tenancy()->initialize($tenant);  // switch to tenant DB
+
         $user = User::create([
             'name' => $request->name,
             'email' => $request->email,
             'password' => Hash::make($request->password),
         ]);
 
-        // Log in the new user
+        // Log in the new user with tenant db
         Auth::login($user);
 
         return redirect()->to('http://' . $tenant->domains->first()->domain);

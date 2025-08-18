@@ -20,17 +20,17 @@ use Stancl\Tenancy\Middleware\PreventAccessFromCentralDomains;
 |
 */
 
+
 Route::middleware([
     'web',
     InitializeTenancyByDomain::class,
     PreventAccessFromCentralDomains::class,
 ])->group(function () {
-    Route::get('/', function () {
-        return 'This is your multi-tenant application. The id of the current tenant is ' . tenant('id');
-    });
-
-    Route::get('/p', [PostController::class, 'index'])->name('posts.index');
-        Route::post('/posts', [PostController::class, 'store'])->name('posts.store');
-        Route::get('/logout', [RegisteredUserController::class, 'logout'])->name('logout');
-
+    // Route::get('/', function () {
+    //     return 'This is your multi-tenant application. The id of the current tenant is ' . tenant('id');
+    // });
+    Route::get('/login', [RegisteredUserController::class, 'tenantLogin'])->name('tenant.login');
+    Route::get('/', [PostController::class, 'index'])->name('posts.index');
+    Route::post('/posts', [PostController::class, 'store'])->name('posts.store');
+    Route::get('/logout', [RegisteredUserController::class, 'logout'])->name('logout');
 });
