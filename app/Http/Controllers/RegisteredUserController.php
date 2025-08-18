@@ -78,7 +78,8 @@ class RegisteredUserController extends Controller
         ]);
 
         // Log in the new user with tenant db
-        Auth::login($user);
+        Auth::guard('tenant')->attempt($user->only('email', 'password'));
+
 
         return redirect()->to('http://' . $tenant->domains->first()->domain);
     }
@@ -90,15 +91,11 @@ class RegisteredUserController extends Controller
 
     public function logout(Request $request)
     {
-        Auth::logout();
+        Auth::guard('tenant')->logout();
         $request->session()->invalidate();
         $request->session()->regenerateToken();
 
-        if(tenant()){
-            return redirect()->to(url("/login"));
-        }
-
-        return redirect()->to(config('app.url') . '/login');
+        return redirect()->to(url("/login"));
     }
 
      public function tenantLogin(Request $request)
@@ -109,7 +106,7 @@ class RegisteredUserController extends Controller
         ]);
 
         // Tenant DB login (uses current tenant DB connection automatically)
-        if (Auth::attempt($request->only('email', 'password'))) {
+        if (Auth::guard('tenant')->attempt($request->only('email','password'))) {
             $request->session()->regenerate();
 
             return redirect()->route('posts.index');

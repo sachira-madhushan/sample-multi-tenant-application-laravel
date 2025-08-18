@@ -9,7 +9,7 @@
 <body class="bg-gray-100 flex items-center justify-center min-h-screen">
     <div class="bg-white p-8 rounded-lg shadow-lg w-full max-w-md">
         <h1 class="text-2xl font-bold text-center mb-6">Login</h1>
-        <form action="{{ route('login.post') }}" method="POST">
+        <form action="{{ route('tenant.login.post') }}" method="POST">
             @csrf
             <div class="mb-4">
                 <label for="email" class="block text-gray-700 font-bold mb-2">Email</label>

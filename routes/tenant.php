@@ -22,14 +22,25 @@ use Stancl\Tenancy\Middleware\PreventAccessFromCentralDomains;
 
 
 Route::middleware([
-    'web',
     InitializeTenancyByDomain::class,
+    'web',
     PreventAccessFromCentralDomains::class,
 ])->group(function () {
+
+    config(['session.cookie' => 'tenant_' . tenant('id') . '_session']);
+
+    // Tenant login routes — no auth middleware
     Route::get('/login', [RegisteredUserController::class, 'tenantLoginForm'])->name('tenant.login');
     Route::post('/login', [RegisteredUserController::class, 'tenantLogin'])->name('tenant.login.post');
-    Route::get('/logout', [RegisteredUserController::class, 'logout'])->name('tenant.logout');
+});
 
+Route::middleware([
+    InitializeTenancyByDomain::class,
+    'web',
+    PreventAccessFromCentralDomains::class,
+    'auth:tenant', // only protect these routes
+])->group(function () {
+    Route::get('/logout', [RegisteredUserController::class, 'logout'])->name('tenant.logout');
     Route::get('/', [PostController::class, 'index'])->name('posts.index');
     Route::post('/posts', [PostController::class, 'store'])->name('posts.store');
 });
