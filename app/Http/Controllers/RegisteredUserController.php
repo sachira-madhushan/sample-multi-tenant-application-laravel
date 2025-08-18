@@ -32,7 +32,7 @@ class RegisteredUserController extends Controller
             // Find the tenant for this user
             $tenant = Tenant::where('email', $request->email)->first();
             if ($tenant) {
-                return redirect()->away('http://' . $tenant->domains->first()->domain);
+                return redirect()->away('http://' . $tenant->domains->first()->domain."/login");
             }
 
             // If no tenant found, just redirect home
@@ -83,12 +83,40 @@ class RegisteredUserController extends Controller
         return redirect()->to('http://' . $tenant->domains->first()->domain);
     }
 
+    public function tenantLoginForm()
+    {
+        return view('auth.tenant-login'); // tenant login form (different view if you want)
+    }
+
     public function logout(Request $request)
     {
         Auth::logout();
         $request->session()->invalidate();
         $request->session()->regenerateToken();
 
-        return redirect()->to(config('app.url'));
+        if(tenant()){
+            return redirect()->to(url("/login"));
+        }
+
+        return redirect()->to(config('app.url') . '/login');
+    }
+
+     public function tenantLogin(Request $request)
+    {
+        $request->validate([
+            'email' => 'required|email',
+            'password' => 'required',
+        ]);
+
+        // Tenant DB login (uses current tenant DB connection automatically)
+        if (Auth::attempt($request->only('email', 'password'))) {
+            $request->session()->regenerate();
+
+            return redirect()->route('posts.index');
+        }
+
+        throw ValidationException::withMessages([
+            'email' => [trans('auth.failed')],
+        ]);
     }
 }
