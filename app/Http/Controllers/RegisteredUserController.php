@@ -32,7 +32,7 @@ class RegisteredUserController extends Controller
             // Find the tenant for this user
             $tenant = Tenant::where('email', $request->email)->first();
             if ($tenant) {
-                return redirect()->away('http://' . $tenant->domains->first()->domain."/login");
+                return redirect()->away('http://' . $tenant->domains->first()->domain . "/login");
             }
 
             // If no tenant found, just redirect home
@@ -86,6 +86,11 @@ class RegisteredUserController extends Controller
 
     public function tenantLoginForm()
     {
+        if (Auth::guard('tenant')->check()) {
+            // Redirect to tenant dashboard
+            return redirect()->route('posts.index');
+        }
+
         return view('auth.tenant-login'); // tenant login form (different view if you want)
     }
 
@@ -98,7 +103,7 @@ class RegisteredUserController extends Controller
         return redirect()->to(url("/login"));
     }
 
-     public function tenantLogin(Request $request)
+    public function tenantLogin(Request $request)
     {
         $request->validate([
             'email' => 'required|email',
@@ -106,7 +111,7 @@ class RegisteredUserController extends Controller
         ]);
 
         // Tenant DB login (uses current tenant DB connection automatically)
-        if (Auth::guard('tenant')->attempt($request->only('email','password'))) {
+        if (Auth::guard('tenant')->attempt($request->only('email', 'password'))) {
             $request->session()->regenerate();
 
             return redirect()->route('posts.index');
