@@ -9,7 +9,7 @@
 <body class="bg-gray-100 p-8">
     <div class="max-w-4xl mx-auto">
         <div class="flex justify-between items-center mb-6">
-            {{-- <h1 class="text-3xl font-bold">Welcome, {{ Auth::user()->name }}</h1> --}}
+            <h1 class="text-3xl font-bold">Welcome, {{ Auth::guard('tenant')->user()->name ?? 'Guest' }}</h1>
             <a href="{{ route('tenant.logout') }}" class="bg-red-500 text-white p-2 rounded-md hover:bg-red-600">Logout</a>
         </div>
 
