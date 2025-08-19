@@ -1,61 +1,190 @@
-<p align="center"><a href="https://laravel.com" target="_blank"><img src="https://raw.githubusercontent.com/laravel/art/master/logo-lockup/5%20SVG/2%20CMYK/1%20Full%20Color/laravel-logolockup-cmyk-red.svg" width="400" alt="Laravel Logo"></a></p>
 
-<p align="center">
-<a href="https://github.com/laravel/framework/actions"><img src="https://github.com/laravel/framework/workflows/tests/badge.svg" alt="Build Status"></a>
-<a href="https://packagist.org/packages/laravel/framework"><img src="https://img.shields.io/packagist/dt/laravel/framework" alt="Total Downloads"></a>
-<a href="https://packagist.org/packages/laravel/framework"><img src="https://img.shields.io/packagist/v/laravel/framework" alt="Latest Stable Version"></a>
-<a href="https://packagist.org/packages/laravel/framework"><img src="https://img.shields.io/packagist/l/laravel/framework" alt="License"></a>
-</p>
+# Sample Laravel Multitenant Application
 
-## About Laravel
+This is a **sample multitenant Laravel application** designed to demonstrate how to manage multiple tenant databases, authentication, and isolated routes.It includes guides for **local testing with Herd**, **deployment to production with Nginx**, and general project setup.
 
-Laravel is a web application framework with expressive, elegant syntax. We believe development must be an enjoyable and creative experience to be truly fulfilling. Laravel takes the pain out of development by easing common tasks used in many web projects, such as:
+---
 
-- [Simple, fast routing engine](https://laravel.com/docs/routing).
-- [Powerful dependency injection container](https://laravel.com/docs/container).
-- Multiple back-ends for [session](https://laravel.com/docs/session) and [cache](https://laravel.com/docs/cache) storage.
-- Expressive, intuitive [database ORM](https://laravel.com/docs/eloquent).
-- Database agnostic [schema migrations](https://laravel.com/docs/migrations).
-- [Robust background job processing](https://laravel.com/docs/queues).
-- [Real-time event broadcasting](https://laravel.com/docs/broadcasting).
 
-Laravel is accessible, powerful, and provides tools required for large, robust applications.
 
-## Learning Laravel
 
-Laravel has the most extensive and thorough [documentation](https://laravel.com/docs) and video tutorial library of all modern web application frameworks, making it a breeze to get started with the framework.
+## Features
 
-You may also try the [Laravel Bootcamp](https://bootcamp.laravel.com), where you will be guided through building a modern Laravel application from scratch.
+- 🏢 Multi-Tenant Architecture (Database-per-tenant approach)
+- 🔐 Tenant-specific Authentication (Login/Register per tenant)
+- 🌐 Tenant-based Routing (Dynamic DB connection per request)
+- 🛠️ RESTful API for tenants
+- 🐘 MySQL supported
+- 🖥️ Local development supported with **Herd** (Mac/Windows)
 
-If you don't feel like reading, [Laracasts](https://laracasts.com) can help. Laracasts contains thousands of video tutorials on a range of topics including Laravel, modern PHP, unit testing, and JavaScript. Boost your skills by digging into our comprehensive video library.
 
-## Laravel Sponsors
+## Installation
 
-We would like to extend our thanks to the following sponsors for funding Laravel development. If you are interested in becoming a sponsor, please visit the [Laravel Partners program](https://partners.laravel.com).
+### 1️⃣ Clone the Repository
+```bash
+git clone https://github.com/DI11SOFT/sample-multi-tenant-laravel-application.git
+cd sample-multi-tenant-laravel-application
+```
 
-### Premium Partners
+### 2️⃣ Install Dependencies
+```
+composer install
+```
 
-- **[Vehikl](https://vehikl.com)**
-- **[Tighten Co.](https://tighten.co)**
-- **[Kirschbaum Development Group](https://kirschbaumdevelopment.com)**
-- **[64 Robots](https://64robots.com)**
-- **[Curotec](https://www.curotec.com/services/technologies/laravel)**
-- **[DevSquad](https://devsquad.com/hire-laravel-developers)**
-- **[Redberry](https://redberry.international/laravel-development)**
-- **[Active Logic](https://activelogic.com)**
+### 3️⃣ Configure Environment
 
-## Contributing
+Copy the example .env file and update your credentials:
+```
+cp .env.example .env
+```
 
-Thank you for considering contributing to the Laravel framework! The contribution guide can be found in the [Laravel documentation](https://laravel.com/docs/contributions).
+Edit .env and set:
 
-## Code of Conduct
+```
+APP_NAME="Laravel Multitenant"
+APP_ENV=local
+APP_KEY=base64:GENERATE_KEY
+APP_DEBUG=true
+APP_URL=http://multitenant.local
 
-In order to ensure that the Laravel community is welcoming to all, please review and abide by the [Code of Conduct](https://laravel.com/docs/contributions#code-of-conduct).
+DB_CONNECTION=mysql
+DB_HOST=127.0.0.1
+DB_PORT=3306
+DB_DATABASE=central_db
+DB_USERNAME=root
+DB_PASSWORD=
 
-## Security Vulnerabilities
+TENANCY_DOMAIN_IDENTIFICATION=true
+TENANCY_DB_CONNECTION=mysql
 
-If you discover a security vulnerability within Laravel, please send an e-mail to Taylor Otwell via [taylor@laravel.com](mailto:taylor@laravel.com). All security vulnerabilities will be promptly addressed.
+SESSION_DOMAIN=.multitenant.local
 
-## License
+```
 
-The Laravel framework is open-sourced software licensed under the [MIT license](https://opensource.org/licenses/MIT).
+### 4️⃣ Generate App Key
+```
+php artisan key:generate
+
+```
+
+### 5️⃣ Run Migrations
+
+```
+php artisan migrate
+```
+
+
+## Local Testing with Herd
+
+Herd is the official Laravel local development tool.
+Steps:
+
+Install Herd on your system.
+
+Create a local domain mapping:
+```
+
+herd link
+```
+
+Example:
+```
+http://multitenant.local
+```
+
+Update .env:
+```
+APP_URL=http://multitenant.local
+```
+
+Start Herd:
+```
+herd start
+```
+
+Open browser at:
+```
+http://multitenant.local
+```
+
+
+
+## 🌍 Hosting Guide (Production)
+
+Server Requirements
+```
+PHP 8.2+
+
+MySQL 8 / MariaDB
+
+Composer
+
+Nginx / Apache
+
+```
+Deployment Steps
+
+```
+Upload project files to your server (/var/www/multitenant).
+```
+
+Install dependencies:
+```
+composer install --optimize-autoloader --no-dev
+```
+
+Set correct permissions:
+```
+sudo chown -R www-data:www-data /var/www/multitenant
+sudo chmod -R 775 /var/www/multitenant/storage /var/www/multitenant/bootstrap/cache
+```
+
+Configure .env with production database credentials.
+
+Run migrations:
+```
+php artisan migrate --force
+```
+
+Cache configs for performance:
+```
+php artisan config:cache
+php artisan route:cache
+php artisan view:cache
+```
+## ⚙️ Nginx Configuration
+
+Add a new server block in /etc/nginx/sites-available/multitenant:
+```
+server {
+    listen 80;
+    server_name multitenant.com *.multitenant.com;
+
+    root /var/www/multitenant/public;
+
+    index index.php index.html;
+
+    access_log /var/log/nginx/multitenant_access.log;
+    error_log /var/log/nginx/multitenant_error.log;
+
+    location / {
+        try_files $uri $uri/ /index.php?$query_string;
+    }
+
+    location ~ \.php$ {
+        include snippets/fastcgi-php.conf;
+        fastcgi_pass unix:/var/run/php/php8.2-fpm.sock;
+        fastcgi_param SCRIPT_FILENAME $document_root$fastcgi_script_name;
+        include fastcgi_params;
+    }
+
+    location ~ /\.ht {
+        deny all;
+    }
+}
+
+```
+
+## ⚙️ DNS Configuration
+
+Forward all main domain and all subdomain to the VPS from the DNS configurations of the domain and add A records to the DNS configurations records to point main domain and all subdomain to point to the VPS.
