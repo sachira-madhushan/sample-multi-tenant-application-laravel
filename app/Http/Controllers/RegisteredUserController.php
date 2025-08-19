@@ -32,7 +32,7 @@ class RegisteredUserController extends Controller
             // Find the tenant for this user
             $tenant = Tenant::where('email', $request->email)->first();
             if ($tenant) {
-                return redirect()->away('http://' . $tenant->domains->first()->domain . "/login");
+                return redirect()->away('https://' . $tenant->domains->first()->domain . "/login");
             }
 
             // If no tenant found, just redirect home
@@ -81,7 +81,7 @@ class RegisteredUserController extends Controller
         Auth::guard('tenant')->attempt($user->only('email', 'password'));
 
 
-        return redirect()->to('http://' . $tenant->domains->first()->domain);
+        return redirect()->to('https://' . $tenant->domains->first()->domain);
     }
 
     public function tenantLoginForm()
